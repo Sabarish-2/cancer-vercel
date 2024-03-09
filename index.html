@@ -60,6 +60,7 @@
     <div id="result"></div>
 
     <script>
+
         function handleFiles(event) {
             const fileInput = event.target;
             handleImageUpload(fileInput.files[0]);
@@ -92,13 +93,19 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 const resultDiv = document.getElementById('result');
                 resultDiv.innerText = data.result;
             })
             .catch(error => {
                 console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
             });
         }
     </script>
