@@ -13,19 +13,19 @@
         h1 {
             text-align: center;
         }
-        #imageInput {
-            display: block;
-            margin: 20px auto;
-        }
-        #uploadButton {
-            display: block;
-            margin: 0 auto;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
+        #dropArea {
+            border: 2px dashed #ccc;
             border-radius: 5px;
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+        }
+        #imageInput {
+            display: none;
         }
         #result {
             text-align: center;
@@ -36,15 +36,29 @@
 </head>
 <body>
     <h1>Tumor Detection</h1>
-    <input type="file" id="imageInput" accept="image/*">
-    <button id="uploadButton" onclick="uploadImage()">Upload Image</button>
+    <div id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+        <input type="file" id="imageInput" accept="image/*" onchange="handleFiles(event)">
+        <p>Drag and drop image here or click to select</p>
+    </div>
     <div id="result"></div>
 
     <script>
-        function uploadImage() {
-            const fileInput = document.getElementById('imageInput');
-            const file = fileInput.files[0];
+        function handleFiles(event) {
+            const fileInput = event.target;
+            handleImageUpload(fileInput.files[0]);
+        }
 
+        function handleDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            handleImageUpload(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+        }
+
+        function handleImageUpload(file) {
             if (!file) {
                 alert('Please select an image.');
                 return;
