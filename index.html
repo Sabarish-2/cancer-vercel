@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tumor Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #imageInput {
+            display: block;
+            margin: 20px auto;
+        }
+        #uploadButton {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tumor Detection</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <button id="uploadButton" onclick="uploadImage()">Upload Image</button>
+    <div id="result"></div>
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerText = data.result;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
