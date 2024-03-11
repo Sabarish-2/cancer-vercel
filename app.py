@@ -44,9 +44,14 @@ def predict():
     # Return prediction result
     return jsonify({'result': result})
 
+@app.route('/')
+def index():
+    return render_template('index.html', name='World')
+
 @app.route('/<name>')
 def home(name):
     return render_template('index.html', name=name)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
