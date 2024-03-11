@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
-import gdown
+# import gdown
+
+# pip install Flask opencv-python-headless numpy tensorflow gdown
 
 app = Flask(__name__)
 
 # Download the model file from Google Drive
-model_url = 'https://drive.google.com/uc?id=13Z0fHGPi4XdQEua8SdyAry1azdMUV8wk'
-model_path = 'tumor.h5'  # Update the filename here
-gdown.download(model_url, model_path, quiet=False)
+# model_url = 'https://drive.google.com/uc?id=13Z0fHGPi4XdQEua8SdyAry1azdMUV8wk'
+model_path = 'model/tumor.h5'  # Update the filename here
+# gdown.download(model_url, model_path, quiet=False)
 
 # Load the model
 model = load_model(model_path)
@@ -31,6 +33,10 @@ def predict():
     
     # Return prediction result
     return jsonify({'result': result})
+
+@app.route('/<name>')
+def home(name):
+    return render_template('index.html', name=name)
 
 if __name__ == '__main__':
     app.run(debug=True)
