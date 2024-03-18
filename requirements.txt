@@ -2,5 +2,4 @@ Flask
 Gunicorn
 opencv-python
 numpy
-tensorflow
 gdown
