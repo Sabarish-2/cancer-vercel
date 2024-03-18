@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
+from tflite_runtime.interpreter import Interpreter
 # from tensorflow.keras.models import load_model
 # import gdown
 import os
