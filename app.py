@@ -1,18 +1,35 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
-from tensorflow.keras.models import load_model
-import gdown
+from tflite_runtime.interpreter import Interpreter
+# from tensorflow.keras.models import load_model
+# import gdown
+import os
+
+# pip install Flask opencv-python-headless numpy tensorflow gdown
 
 app = Flask(__name__)
 
+# model_path = 'model/tumor.h5'  # LOCAL
+model_path = 'model/model.tflite'  # LOCAL
+
 # Download the model file from Google Drive
-model_url = 'https://drive.google.com/uc?id=13Z0fHGPi4XdQEua8SdyAry1azdMUV8wk'
-model_path = 'tumor.h5'  # Update the filename here
-gdown.download(model_url, model_path, quiet=False)
+# if not os.path.exists(model_path):
+#     model_path = 'tumor.h5'  # Update the filename here
+#     print("Downloading model file...")
+#     model_url = 'https://drive.google.com/uc?id=13Z0fHGPi4XdQEua8SdyAry1azdMUV8wk'
+#     gdown.download(model_url, model_path, quiet=False)
+#     print("Model file downloaded successfully.")
+# else:
+#     print("Model file already exists.")
+
+
 
 # Load the model
-model = load_model(model_path)
+# model = load_model(model_path)
+model = Interpreter(model_path)
+model.allocate_tensors()
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -26,11 +43,31 @@ def predict():
     img_array = np.expand_dims(img_array, axis=0)
     
     # Make prediction
-    prediction = model.predict(img_array)
+    # prediction = model.predict(img_array)
+    # Set the tensor (model input)
+    input_details = model.get_input_details()
+    model.set_tensor(input_details[0]['index'], img_array)
+    
+    # Run the model
+    model.invoke()
+    
+    # Get the tensor (model output)
+    output_details = model.get_output_details()
+    prediction = model.get_tensor(output_details[0]['index'])
+    
     result = 'Tumor Detected' if prediction[0][0] > 0.5 else 'No Tumor Detected'
     
     # Return prediction result
     return jsonify({'result': result})
+
+@app.route('/')
+def index():
+    return render_template('index.html', name='World')
+
+@app.route('/<name>')
+def home(name):
+    return render_template('index.html', name=name)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

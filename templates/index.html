@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tumor Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        #dropArea {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #fff;
+        }
+        #dropArea:hover {
+            border-color: #007bff;
+        }
+        #imageInput {
+            display: none;
+        }
+        #selectButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tumor Detection</h1>
+    <div id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" onclick="clickImageInput()">
+        <input type="file" id="imageInput" accept="image/*" onchange="handleFiles(event)">
+        <p>Drag and drop image here or click to select</p>
+    </div>
+    <button id="selectButton" onclick="clickImageInput()">Select Image</button>
+    <div id="result"></div>
+
+    <script>
+
+        function handleFiles(event) {
+            const fileInput = event.target;
+            handleImageUpload(fileInput.files[0]);
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            handleImageUpload(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+        }
+
+        function clickImageInput() {
+            document.getElementById('imageInput').click();
+        }
+
+        function handleImageUpload(file) {
+            if (!file) {
+                alert('Please select an image.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerText = data.result;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
+        }
+    </script>
+</body>
+</html>
