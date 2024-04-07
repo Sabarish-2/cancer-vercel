@@ -26,7 +26,10 @@ model_path = 'model/model.tflite'  # LOCAL
 
 
 # Load the model
-model = load_model(model_path)
+# model = load_model(model_path)
+model = Interpreter(model_path)
+model.allocate_tensors()
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -40,7 +43,18 @@ def predict():
     img_array = np.expand_dims(img_array, axis=0)
     
     # Make prediction
-    prediction = model.predict(img_array)
+    # prediction = model.predict(img_array)
+    # Set the tensor (model input)
+    input_details = model.get_input_details()
+    model.set_tensor(input_details[0]['index'], img_array)
+    
+    # Run the model
+    model.invoke()
+    
+    # Get the tensor (model output)
+    output_details = model.get_output_details()
+    prediction = model.get_tensor(output_details[0]['index'])
+    
     result = 'Tumor Detected' if prediction[0][0] > 0.5 else 'No Tumor Detected'
     
     # Return prediction result

@@ -3,3 +3,4 @@ Gunicorn
 opencv-python
 numpy
 gdown
+tflite_runtime
