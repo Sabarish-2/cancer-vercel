@@ -85,6 +85,8 @@
                 alert('Please select an image.');
                 return;
             }
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = "Predicting...";
 
             const formData = new FormData();
             formData.append('image', file);
@@ -95,15 +97,16 @@
             })
             .then(response => {
                 if (!response.ok) {
+                    resultDiv.innerText = "";
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then(data => {
-                const resultDiv = document.getElementById('result');
                 resultDiv.innerText = data.result;
             })
             .catch(error => {
+                resultDiv.innerText = "";
                 console.error('Error:', error);
                 alert('An error occurred. Please try again later.');
             });
